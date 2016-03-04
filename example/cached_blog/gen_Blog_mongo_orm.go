@@ -2,7 +2,6 @@ package blog
 
 import (
 	//3rd party libs
-
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 

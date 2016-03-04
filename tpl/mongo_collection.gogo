@@ -117,6 +117,15 @@ func (o *_{{.Name}}Mgr) FindByIDs(id []string, sortFields ...string) (result []*
 }
 
 func (m *_{{.Name}}Mgr) FindByID(id string) (result *{{$obj.Name}}, err error) {
+	if {{.Name}}Cache == nil {
+		return {{.Name}}Mgr.FindByIDFromDB(id)
+	}
+
+	err = {{.Name}}Cache.Get(id, &result)
+	return
+}
+
+func (m *_{{.Name}}Mgr) FindByIDFromDB(id string) (result *{{$obj.Name}}, err error) {
 	session, col := {{.Name}}Mgr.GetCol()
 	defer session.Close()
 

@@ -6,6 +6,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 
 	//Own libs
+	"github.com/ezbuy/ezorm/cache"
 	"github.com/ezbuy/ezorm/db"
 	. "github.com/ezbuy/ezorm/orm"
 
@@ -26,6 +27,10 @@ func init() {
 	{{if .NeedSearch}}
 	RegisterIndexer("{{.Package}}", "{{.Name}}", {{.Name}}Mgr.SearchRebuild)
 	{{end}}
+}
+
+func InitCache(c cache.Cache) {
+	{{.Name}}Cache = c
 }
 
 {{if .NeedMapping}}

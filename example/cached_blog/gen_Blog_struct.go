@@ -1,9 +1,8 @@
 package blog
 
-import (
-	"github.com/ezbuy/ezorm/cache"
-	"gopkg.in/mgo.v2/bson"
-)
+import "gopkg.in/mgo.v2/bson"
+
+import "github.com/ezbuy/ezorm/cache"
 
 type Blog struct {
 	ID bson.ObjectId `bson:"_id,omitempty"`
