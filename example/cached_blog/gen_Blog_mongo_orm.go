@@ -3,18 +3,13 @@ package blog
 import (
 	//3rd party libs
 
-	"encoding/json"
-	"net/http"
-
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 
 	//Own libs
 	"github.com/ezbuy/ezorm/cache"
-	"github.com/ezbuy/ezorm/codec"
 	"github.com/ezbuy/ezorm/db"
 	. "github.com/ezbuy/ezorm/orm"
-	"github.com/golang/groupcache"
 )
 
 func init() {
@@ -26,25 +21,8 @@ func init() {
 
 }
 
-func InitCache(selfAddr string, peerAddrs []string, cacheBytes int64) {
-	peers := groupcache.NewHTTPPool(selfAddr)
-	group := groupcache.NewGroup("BlogCache", cacheBytes, groupcache.GetterFunc(
-		func(ctx groupcache.Context, key string, dest groupcache.Sink) error {
-			result, err := BlogMgr.FindByIDFromDB(key)
-			if err != nil {
-				return err
-			}
-
-			data, err := json.Marshal(result)
-			dest.SetBytes((data))
-			return nil
-		}))
-
-	peers.Set(peerAddrs...)
-
-	go http.ListenAndServe(selfAddr, peers)
-	codec := codec.NewJSONCodec()
-	BlogCache = cache.NewGroupCache(group, codec)
+func InitCache(c cache.Cache) {
+	BlogCache = c
 }
 
 func initBlogIndex() {

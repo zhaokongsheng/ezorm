@@ -9,7 +9,10 @@ import (
 	"testing"
 	"time"
 
+	"github.com/ezbuy/ezorm/cache"
+	"github.com/ezbuy/ezorm/codec"
 	"github.com/ezbuy/ezorm/db"
+	"github.com/golang/groupcache"
 	"gopkg.in/mgo.v2"
 )
 
@@ -54,9 +57,30 @@ func dbInit() {
 		w.Write([]byte("ok"))
 	})
 
-	InitCache("http://127.0.0.1:8001", []string{"http://127.0.0.1:8001", "http://127.0.0.1:8002"}, 64<<20)
+	initCache("http://127.0.0.1:8001", []string{"http://127.0.0.1:8001", "http://127.0.0.1:8002"}, 64<<20)
 	fmt.Printf("start listening on port [%s]\n", listenPort)
 	go http.ListenAndServe(listenPort, nil)
+}
+
+func initCache(selfAddr string, peerAddrs []string, cacheBytes int64) {
+	peers := groupcache.NewHTTPPool(selfAddr)
+	group := groupcache.NewGroup("BlogCache", cacheBytes, groupcache.GetterFunc(
+		func(ctx groupcache.Context, key string, dest groupcache.Sink) error {
+			result, err := BlogMgr.FindByIDFromDB(key)
+			if err != nil {
+				return err
+			}
+
+			data, err := json.Marshal(result)
+			dest.SetBytes((data))
+			return nil
+		}))
+
+	peers.Set(peerAddrs...)
+
+	go http.ListenAndServe(selfAddr, peers)
+	codec := codec.NewJSONCodec()
+	InitCache(cache.NewGroupCache(group, codec))
 }
 
 func TestBlog(t *testing.T) {
