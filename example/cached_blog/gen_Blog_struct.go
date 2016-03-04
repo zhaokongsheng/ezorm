@@ -1,7 +1,9 @@
 package blog
 
-import "gopkg.in/mgo.v2/bson"
-import "github.com/golang/groupcache"
+import (
+	"github.com/ezbuy/ezorm/cache"
+	"gopkg.in/mgo.v2/bson"
+)
 
 type Blog struct {
 	ID bson.ObjectId `bson:"_id,omitempty"`
@@ -33,7 +35,7 @@ type _BlogMgr struct {
 
 var BlogMgr *_BlogMgr
 
-var BlogCache *groupcache.Group
+var BlogCache cache.Cache
 
 func (m *_BlogMgr) NewBlog() *Blog {
 	rval := new(Blog)

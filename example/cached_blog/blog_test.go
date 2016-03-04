@@ -54,7 +54,7 @@ func dbInit() {
 		w.Write([]byte("ok"))
 	})
 
-	InitCache("http://127.0.0.1:8001", []string{"http://127.0.0.1:8001", "http://127.0.0.1:8002"})
+	InitCache("http://127.0.0.1:8001", []string{"http://127.0.0.1:8001", "http://127.0.0.1:8002"}, 64<<20)
 	fmt.Printf("start listening on port [%s]\n", listenPort)
 	go http.ListenAndServe(listenPort, nil)
 }
