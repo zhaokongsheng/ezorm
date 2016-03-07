@@ -153,9 +153,17 @@ func (m *_{{.Name}}Mgr) RemoveByID(id string) (err error) {
 		return
 	}
 	err = col.RemoveId(bson.ObjectIdHex(id))
+	if err != nil {
+		return
+	}
 	{{if .NeedSearch}}
 	core.Delete("{{$obj.SearchIndex}}", "{{$obj.SearchType}}", id, nil)
 	{{end}}
+
+	if {{.Name}}Cache != nil {
+		{{.Name}}Cache.Remove(id)
+	}
+
 	return
 }
 

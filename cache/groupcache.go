@@ -26,4 +26,8 @@ func (c *GroupCache) Get(key string, dest interface{}) error {
 	return c.codec.Decode(data, dest)
 }
 
+func (c *GroupCache) Remove(key string) {
+	c.group.Remove(key)
+}
+
 var _ Cache = (*GroupCache)(nil)

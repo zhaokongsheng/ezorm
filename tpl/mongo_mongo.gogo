@@ -48,6 +48,7 @@ func (o *{{.Name}}) Save() (info *mgo.ChangeInfo, err error) {
 		{{.Name}}InsertCallback(o)
 	} else {
 		{{.Name}}UpdateCallback(o)
+		{{.Name}}Cache.Remove(o.Id())
 	}
 
 	return

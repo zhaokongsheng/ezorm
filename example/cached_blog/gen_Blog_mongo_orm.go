@@ -108,6 +108,7 @@ func (o *Blog) Save() (info *mgo.ChangeInfo, err error) {
 		BlogInsertCallback(o)
 	} else {
 		BlogUpdateCallback(o)
+		BlogCache.Remove(o.Id())
 	}
 
 	return
@@ -301,6 +302,13 @@ func (m *_BlogMgr) RemoveByID(id string) (err error) {
 		return
 	}
 	err = col.RemoveId(bson.ObjectIdHex(id))
+	if err != nil {
+		return
+	}
+
+	if BlogCache != nil {
+		BlogCache.Remove(id)
+	}
 
 	return
 }
