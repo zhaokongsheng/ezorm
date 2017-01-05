@@ -521,10 +521,32 @@ func TestFindByIds(t *testing.T) {
 		t.Errorf("delete error:%s", err.Error())
 	}
 
-	maxNum := 11000
-	ids := make([]int32, 0, maxNum)
+	maxInsertLimit := 100
+	maxNum := 3000
+	newPeoples := make([]*People, 0, maxInsertLimit)
 	for i := 0; i < maxNum; i++ {
-		ids = append(ids, int32(i))
+		newPeoples = append(newPeoples, newUnsavedPeople())
+		if (i+1)%maxInsertLimit == 0 {
+			_, err = PeopleMgr.InsertBatch(newPeoples)
+			if err != nil {
+				t.Errorf("InsertBatch err:%v", err)
+			}
+			newPeoples = newPeoples[:0]
+		}
+	}
+
+	peoples, err := PeopleMgr.FindAll()
+	if err != nil {
+		t.Errorf("FindAll err:%v", err)
+	}
+
+	if len(peoples) != maxNum {
+		t.Errorf("len(peoples)[%d] != maxNum[%d]", len(peoples), maxNum)
+	}
+
+	ids := make([]int32, maxNum)
+	for i, p := range peoples {
+		ids[i] = p.PeopleId
 	}
 
 	vals, err := PeopleMgr.FindByIDs(ids)
@@ -532,5 +554,7 @@ func TestFindByIds(t *testing.T) {
 		t.Errorf("error:[%v]", err)
 	}
 
-	fmt.Println("vals len:%v", len(vals))
+	if len(vals) != maxNum {
+		t.Errorf("len(vals)[%d] != maxNum[%d]", len(vals), maxNum)
+	}
 }
